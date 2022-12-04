@@ -10,7 +10,7 @@ from django_echarts.geojson import use_geojson, geojson_url
 from django_echarts.starter import DJESite, SiteOpts, DJESiteBackendView
 from django_echarts.stores.entity_factory import factory
 from pyecharts import options as opts
-from pyecharts.charts import Bar, Timeline, Map, Pie, WordCloud, Line, Geo
+from pyecharts.charts import Bar, Timeline, Map, Pie, WordCloud, Line, Geo, Graph
 from pyecharts.components import Table
 from pyecharts.globals import ThemeType, ChartType, SymbolType
 
@@ -285,6 +285,30 @@ def travel_map():
     geo_map.height = '800px'
     use_geojson(geo_map, map_name='福建市县', url=geojson_url('fujian.geojson'))
     return geo_map
+
+
+@site_obj.register_chart
+def graph_demo():
+    nodes = [
+        {"name": "结点1", "symbolSize": 10},
+        {"name": "结点2", "symbolSize": 20},
+        {"name": "结点3", "symbolSize": 30},
+        {"name": "结点4", "symbolSize": 40},
+        {"name": "结点5", "symbolSize": 50},
+        {"name": "结点6", "symbolSize": 40},
+        {"name": "结点7", "symbolSize": 30},
+        {"name": "结点8", "symbolSize": 20},
+    ]
+    links = []
+    for i in nodes:
+        for j in nodes:
+            links.append({"source": i.get("name"), "target": j.get("name")})
+    graph = (
+        Graph()
+            .add("", nodes, links, repulsion=8000)
+            .set_global_opts(title_opts=opts.TitleOpts(title="Graph-基本示例"))
+    )
+    return graph
 
 
 @site_obj.register_collection(title='合辑01', catalog='合辑')
