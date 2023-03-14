@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_echarts',
     'django_echarts.contrib.bootstrap5',
+    # 'django_echarts.xenon',
     'ccs'
 ]
 

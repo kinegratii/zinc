@@ -1,5 +1,5 @@
 prettytable~=3.0
 pyecharts~=1.9
-borax~=3.5
+borax~=4.0
 django~=3.2
 django-echarts~=0.5

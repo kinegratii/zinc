@@ -1,12 +1,16 @@
 import os
+
 from borax.datasets.fetch import fetch
 from django.conf import settings
+from django_echarts.core.exceptions import ChartDoesNotExist
 from django_echarts.datatools.helpers import ceil_n
 from django_echarts.entities import (
     Copyright, ValuesPanel, ValueItem, NamedCharts, WidgetCollection,
-    bootstrap_table_class, LinkItem, RowContainer, Jumbotron
+    bootstrap_table_class, RowContainer
 )
+from django_echarts.entities.uri import ParamsConfig
 from django_echarts.geojson import use_geojson, geojson_url
+from django_echarts.custom_maps import use_custom_map
 from django_echarts.starter import DJESite, SiteOpts, DJESiteBackendView
 from django_echarts.stores.entity_factory import factory
 from pyecharts import options as opts
@@ -20,27 +24,16 @@ __all__ = ['site_obj']
 
 site_obj = DJESite(
     site_title='福建统计',
-    opts=SiteOpts(list_layout='list', nav_shown_pages=['home', 'list', 'settings'], nav_top_fixed=False)
+    opts=SiteOpts(list_layout='list')
 )
 
 site_obj.add_widgets(
     copyright_=Copyright(start_year=2022, powered_by='Zinc'),
-    jumbotron=Jumbotron('福建统计', main_text='数据来源：福建统计局', small_text='2022年2月'),
-    # values_panel='home1_panel',
+    # jumbotron=Jumbotron('福建统计', main_text='数据来源：福建统计局', small_text='2022年2月'),
+    values_panel='home1_panel',
     # jumbotron_chart='search_word_cloud'
 )
 
-site_obj.add_footer_link(
-    LinkItem(text='福建统计年鉴2021', url='https://tjj.fujian.gov.cn/tongjinianjian/dz2021/index.htm', new_page=True)
-
-).add_footer_link(
-    LinkItem(text='网站源码', url='https://github.com/kinegratii/zinc', new_page=True)
-).add_left_link(LinkItem(text='控制板', url='/dashboard/'))
-
-
-# add_footer_link(
-#     LinkItem(text='2021年福建省国民经济和社会发展统计公报', url='https://tjj.fj.gov.cn/xxgk/tjgb/202203/t20220308_5854870.htm',
-#              new_page=True)
 
 @site_obj.register_chart(title='森林覆盖率',
                          description='截止2020年底，福建省土地面积1240.29万公顷，占我国国土总面积1.3%。全省森林面积811.58万公顷，森林覆盖率为66.8%，连续42年位居全国首位。',
@@ -234,7 +227,7 @@ def investment_amount():
 def my_geojson_demo():
     map1 = (
         Map().add(
-            "2020年", FJ_SX_GDP_DATA, maptype="福建市县"
+            "2020年", FJ_SX_GDP_DATA, maptype="fujian.geojson"
         ).set_global_opts(
             title_opts=opts.TitleOpts(title="福建省2020年各县市GDP", subtitle='数据来源:福建统计年鉴2021;单位:亿元'),
             visualmap_opts=opts.VisualMapOpts(max_=2500)
@@ -242,7 +235,8 @@ def my_geojson_demo():
     )
     map1.height = '800px'
 
-    use_geojson(map1, map_name='福建市县', url=geojson_url('fujian.geojson'))
+    # use_geojson(map1, map_name='福建市县', url=geojson_url('fujian.geojson'))
+    use_custom_map(map1, 'fujian.geojson')
     return map1
 
 
@@ -311,6 +305,30 @@ def graph_demo():
     return graph
 
 
+@site_obj.register_chart(title='福建省家庭户类型组成{year}', params_config=ParamsConfig({'year': [1982, 1990, 2000, 2010, 2020]}))
+def yearly_family(year: int):
+    family_types = [
+        '一人户', '二人户', '三人户', '四人户', '五人户', '六人户', '七人户', '八人户', '九人户', '十人及其以上'
+    ]
+    data = [
+        [1982, 7.7, 8.2, 12.2, 17.1, 18.4, 14.7, 10.1, 11.6, 0, 0],
+        [1990, 5.8, 8.6, 16.8, 23.6, 21.4, 11.8, 5.9, 2.9, 1.4, 1.8],
+        [2000, 9.1, 15.5, 25.4, 24.7, 15.8, 5.9, 2.2, 0.8, 0.3, 0.3],
+        [2010, 12.1, 17.2, 24.3, 21.7, 13.7, 6.4, 2.6, 1.1, 0.5, 0.4],
+        [2020, 27.3, 26.3, 19.4, 14.2, 6.9, 4, 1.1, 0.4, 0.2, 0.2]
+    ]
+    yearly_data = {item[0]: item[1:] for item in data}
+    if year not in yearly_data:
+        raise ChartDoesNotExist(f'暂无{year}年数据')
+    year_data = yearly_data[year]
+    bar = (
+        Bar()
+            .add_xaxis(family_types).add_yaxis('百分比(%)', year_data)
+            .set_global_opts(title_opts=opts.TitleOpts("福建省家庭户类型构成-{}年".format(year)))
+    )
+    return bar
+
+
 @site_obj.register_collection(title='合辑01', catalog='合辑')
 def my_collection():
     collection = WidgetCollection(name='test1', title='Test1', layout='s8')
@@ -318,6 +336,7 @@ def my_collection():
     collection.add_chart_widget('search_word_cloud')
     collection.add_chart_widget('employment_percentage')
     collection.add_chart_widget('fj_family_type')
+    collection.add_chart_widget('chart:yearly_family/year/2020')
     return collection
 
 
