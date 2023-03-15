@@ -85,7 +85,7 @@ def fj_family_type():
         bar = (
             Bar()
                 .add_xaxis(family_types).add_yaxis('百分比(%)', item[1:])
-                .set_global_opts(title_opts=opts.TitleOpts("福建省历年家庭户类型构成-{}年".format(year)))
+                .set_global_opts(title_opts=opts.TitleOpts(title="福建省历年家庭户类型构成-{}年".format(year)))
         )
         tl.add(bar, "{}年".format(year))
     return tl
@@ -281,7 +281,7 @@ def travel_map():
     return geo_map
 
 
-@site_obj.register_chart
+@site_obj.register_chart(title='网络图示例')
 def graph_demo():
     nodes = [
         {"name": "结点1", "symbolSize": 10},
@@ -324,9 +324,20 @@ def yearly_family(year: int):
     bar = (
         Bar()
             .add_xaxis(family_types).add_yaxis('百分比(%)', year_data)
-            .set_global_opts(title_opts=opts.TitleOpts("福建省家庭户类型构成-{}年".format(year)))
+            .set_global_opts(title_opts=opts.TitleOpts(title="福建省家庭户类型构成-{}年".format(year)))
     )
     return bar
+
+
+@site_obj.register_chart(title='飞机座位布局（svg示例）')
+def flight_seat_svg():
+    flight_map = Geo()
+    flight_map.add_schema(maptype='flight_seats.svg', selected_mode='multiple', layout_center=['50%', '50%'],
+                          layout_size='95%', itemstyle_opts=opts.ItemStyleOpts(color='#fff'),
+                          emphasis_itemstyle_opts=opts.ItemStyleOpts(color=None, border_color='green', border_width=2))
+    use_custom_map(flight_map, map_name='flight_seats.svg')
+    flight_map.height = '800px'
+    return flight_map
 
 
 @site_obj.register_collection(title='合辑01', catalog='合辑')
