@@ -4,13 +4,14 @@
 
 **线上部署： [https://zinc.pythonanywhere.com](https://zinc.pythonanywhere.com)**
 
-这是一个 [django-echarts](https://github.com/kinegratii/django-echarts) 的示例项目，由下列主要python包构建:
+这是一个 [django-echarts](https://github.com/kinegratii/django-echarts) 的示例项目。
 
-```text
-django~=3.2
-pyecharts~=2.0
-django-echarts~=0.6
-```
+| 代码分支       | Django | pyecharts | django-echarts |
+| -------------- | ------ | --------- | -------------- |
+| master         | 3.2    | 2.0       | 0.6.0          |
+| pyecharts-v191 | 3.2    | 1.9       | 0.6.0          |
+
+django-echarts能够无缝支持pyecharts1.9和2.0，上述分支主要区别在于2.0添加了echarts5支持的图表类型。
 
 ## 功能特性
 
@@ -37,6 +38,7 @@ django-echarts~=0.6
 | 11   | 网络图示例                         | 网络图Graph                          |
 | 12   | 福建省家庭户类型组成               | 参数化图表                           |
 | 13   | 飞机座位布局（svg示例）            | 地理坐标图Geo，使用自定义svg底图     |
+| 14   | 3D地图                             | 3d地图 + 自定义geojson               |
 
 
 

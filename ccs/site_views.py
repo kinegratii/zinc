@@ -14,7 +14,7 @@ from django_echarts.custom_maps import use_custom_map
 from django_echarts.starter import DJESite, SiteOpts, DJESiteBackendView
 from django_echarts.stores.entity_factory import factory
 from pyecharts import options as opts
-from pyecharts.charts import Bar, Timeline, Map, Pie, WordCloud, Line, Geo, Graph
+from pyecharts.charts import Bar, Timeline, Map, Pie, WordCloud, Line, Geo, Graph, Map3D
 from pyecharts.components import Table
 from pyecharts.globals import ThemeType, ChartType, SymbolType
 
@@ -338,6 +338,37 @@ def flight_seat_svg():
     use_custom_map(flight_map, map_name='flight_seats.svg')
     flight_map.height = '800px'
     return flight_map
+
+
+@site_obj.register_chart(title='3D地图')
+def map3d_demo():
+    map_obj = Map3D()
+    map_obj.add_schema(
+        maptype='fujian.geojson',
+        itemstyle_opts=opts.ItemStyleOpts(
+            color="rgb(5,101,123)",
+            opacity=1,
+            border_width=0.8,
+            border_color="rgb(62,215,213)",
+        ),
+        map3d_label=opts.Map3DLabelOpts(
+            is_show=True,
+            text_style=opts.TextStyleOpts(
+                color="#fff", font_size=16, background_color="rgba(0,0,0,0)"
+            ),
+        ),
+        emphasis_label_opts=opts.LabelOpts(is_show=True),
+        light_opts=opts.Map3DLightOpts(
+            main_color="#fff",
+            main_intensity=1.2,
+            is_main_shadow=False,
+            main_alpha=55,
+            main_beta=10,
+            ambient_intensity=0.3,
+        )
+    )
+    use_custom_map(map_obj, 'fujian.geojson')
+    return map_obj
 
 
 @site_obj.register_collection(title='合辑01', catalog='合辑')
